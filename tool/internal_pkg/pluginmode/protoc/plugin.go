@@ -175,19 +175,15 @@ func (pp *protocPlugin) process(gen *protogen.Plugin) {
 			gen.Error(errors.New("no service defined"))
 			return
 		}
-		if !pp.IsUsingMultipleServicesTpl() {
-			// if -tpl multiple_services is not set, specify the last service as the target service
-			pp.ServiceInfo = pp.Services[len(pp.Services)-1]
-		} else {
-			var svcs []*generator.ServiceInfo
-			for _, svc := range pp.Services {
-				if svc.GenerateHandler {
-					svc.RefName = "service" + svc.ServiceName
-					svcs = append(svcs, svc)
-				}
+		pp.ServiceInfo = pp.Services[len(pp.Services)-1]
+		var svcs []*generator.ServiceInfo
+		for _, svc := range pp.Services {
+			if svc.GenerateHandler {
+				svc.RefName = "service" + svc.ServiceName
+				svcs = append(svcs, svc)
 			}
-			pp.PackageInfo.Services = svcs
 		}
+		pp.PackageInfo.Services = svcs
 		fs, err := pp.kg.GenerateMainPackage(&pp.PackageInfo)
 		if err != nil {
 			pp.err = err
